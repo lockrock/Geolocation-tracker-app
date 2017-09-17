@@ -34,6 +34,7 @@ export default class App extends React.Component {
         latitude: 0,
       },
       settingsReady: false,
+      reportsLog: [],
     }
     this.reportsLogger = reportsLogger
     this.reportsLogger.getFullLog() //populate cache
@@ -41,9 +42,9 @@ export default class App extends React.Component {
     .then(maxDistanceToOffice => { this.setState({ maxDistanceToOffice }) })
     .then(()=>{
       return new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition((pos) => {
+        navigator.geolocation.getCurrentPosition(({coords:{longitude, latitude}}) => {
           resolve(
-            getOfficeCoords({defaultCoords: pos})
+            getOfficeCoords({defaultCoords: {longitude, latitude}})
               .then((officeCoords) => { 
                 this.setState(() => ({officeCoords, settingsReady: true})) 
                 return officeCoords
@@ -58,7 +59,7 @@ export default class App extends React.Component {
           this.reportsLogger.logStatusChange(distanceToOffice < this.state.maxDistanceToOffice ? 'inside' : 'outside')
             .then(() => this.reportsLogger.getFullLog())
             .then((log) => {
-              this.setState(() => ({reportsLog: log}))
+              this.setState(() => ({reportsLog: log.slice().reverse()}))
             })
           this.setState({distanceToOffice, distanceError: null})
         }, 
@@ -104,11 +105,15 @@ export default class App extends React.Component {
         
           {
             this.state.distanceError ?
-            <Text>`Error: {this.state.distanceError}`</Text> : null
+            <Text style={styles.distanceContainer}>Error: {this.state.distanceError}</Text> : null
           }
           {
             this.state.distanceToOffice ? 
-            <Text>`Distance: {this.state.distanceToOffice}`</Text> : null
+              ( (this.state.distanceToOffice > this.state.maxDistanceToOffice) ? 
+                <Text style={styles.distanceContainer}>Distance to office: {Math.round(this.state.distanceToOffice)} meters</Text> :
+                <Text style={styles.distanceContainer}>You are at office!</Text>
+              ): 
+              null
           }
         
         <AppDrawer screenProps={{
@@ -135,4 +140,9 @@ const styles = StyleSheet.create({
     // alignItems: 'center',
     // justifyContent: 'flex-stretch',
   },
+  distanceContainer: {
+    fontSize: 20,
+    padding: 5,
+    marginBottom: 5,
+  }
 });

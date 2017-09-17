@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Alert, View, Text, TextInput } from 'react-native'
+import { Alert, View, Text, TextInput, StyleSheet } from 'react-native'
 import SettingsForm from './SettingsForm/SettingsForm'
 
 export default class SettingsScreen extends Component {
@@ -21,9 +21,15 @@ export default class SettingsScreen extends Component {
                         onOfficeLatitudeUpdated={this.props.screenProps.onOfficeLatitudeUpdated}
                         onOfficeDistanceUpdated={this.props.screenProps.onOfficeDistanceUpdated}
                 /> :
-                <Text>Settings is loading</Text>
+                <Text style={styles.container}>Settings is loading</Text>
             }
             </View>
         )
     }
 }
+
+const styles = StyleSheet.create({
+    container: {
+        // fontSize: 15
+    },
+})

@@ -1,7 +1,11 @@
 import React, { Component } from 'react'
-import { Text, View, FlatList } from 'react-native'
+import { Text, View, FlatList, StyleSheet, } from 'react-native'
+import ReportItem from './ReportItem'
 
 export default class DayReportsScreen extends Component {
+
+
+
     constructor(props) {
         super(props)
         this.state = {log: []}
@@ -19,10 +23,12 @@ export default class DayReportsScreen extends Component {
                                         date: new Date(item.timestamp).toString() 
                                         })
                                 )}
-                                renderItem={({item})=> <Text>{JSON.stringify(item)}</Text>} 
+                                renderItem={({item})=> <ReportItem {...item} />} 
                     />
                 }
             </View>
         )
     }
 }
+
+

@@ -37,10 +37,12 @@ export default class ReportsLogger {
                     .then(JSON.parse)
                     .then(log => {
                         if (this.cache.log.length === 0) {
-                            this.cache.log = log
-                            if(log.length > 0) {
-                                this.cache.currentStatus = log[log.length-1].currentStatus
-                            }
+                            if(log) {
+                                this.cache.log = log
+                                if(log.length > 0) {
+                                    this.cache.currentStatus = log[log.length-1].currentStatus
+                                }
+                            } 
                         }
                         return log
                     })

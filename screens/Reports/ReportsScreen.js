@@ -4,7 +4,7 @@ import DayReportsScreen from './DayReports/DayReportsScreen'
 import MonthReportsScreen from './MonthReports/MonthReportsScreen'
 
 const ReportsScreen = TabNavigator({
-    DayReports: {
+    Reports: {
       screen: DayReportsScreen,
     },
     // MonthReports: {
