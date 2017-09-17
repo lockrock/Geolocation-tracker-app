@@ -1,0 +1,8 @@
+node_modules/
+.expo/
+npm-debug.*
+react-native-packager-cache-d5ac4b6dd7e4f868b78f37f783fd5fa549ad8ead/
+.vscode/
+.idea/
+adb.0.log
+haste-map-react-native-packager-1-b46a30b765432b6cbb994d06472eb98f
