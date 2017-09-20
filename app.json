@@ -1,5 +1,18 @@
 {
   "expo": {
-    "sdkVersion": "20.0.0"
+    "sdkVersion": "20.0.0",
+    "android": {
+      "package": "com.locationTracker.app"
+    }
+  },
+  "name": "Geolocation tracker",
+  "version": "1.0.0",
+  "slug": "your-app-slug",
+  "sdkVersion": "20.0.0",
+  "ios": {
+    "bundleIdentifier": "com.locationTracker.app"
+  },
+  "android": {
+    "package": "com.locationTracker.app"
   }
 }

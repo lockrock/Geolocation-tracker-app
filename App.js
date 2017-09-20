@@ -1,9 +1,10 @@
 // @flow
 import React, { Component } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
-import { TabNavigator, DrawerNavigator } from 'react-navigation'
+import { Alert, StyleSheet, Text, View, ScrollView } from 'react-native';
+import { TabNavigator, DrawerNavigator, NavigationActions } from 'react-navigation'
+import { Header } from 'react-native-elements'
 import SettingsScreen from './screens/Settings/SettingsScreen'
-import ReportsScreen from './screens/Reports/ReportsScreen'
+import DayReportsScreen from './screens/Reports/DayReports/DayReportsScreen'
 
 import { watchDistance } from './services/checkIfInside/checkIfInside'
 import ReportsLogger from './services/reports'
@@ -11,12 +12,41 @@ import { getOfficeCoords, setOfficeCoords, setMaxDistanceToOffice, getMaxDistanc
 
 const reportsLogger = new ReportsLogger()
 
+function withNav(WrappedComponent) {
+  return class extends Component {
+    constructor(props) {
+      super(props)
+      this.navigation = props.navigation
+      this.openDrawer = this.openDrawer.bind(this)
+    }
+    openDrawer() {
+      this.navigation.navigate('DrawerOpen')
+    }
+    render() {
+      return (
+        <View style={styles.screenWrapper}>
+          <Header
+            style={styles.header}
+            leftComponent={{ icon: 'menu', color: '#fff', onPress: this.openDrawer }}
+            centerComponent={{ text: 'SMART TRACKER', style: { color: '#fff' } }}
+          />
+
+          <WrappedComponent {...this.props} />
+        </View>
+      )
+    }
+  }
+}
+
+const SettingsWithNav = withNav(SettingsScreen)
+const ReportsWithNav = withNav(DayReportsScreen)
+
 const AppDrawer = DrawerNavigator({
   Settings: {
-    screen: SettingsScreen,
+    screen: SettingsWithNav,
   },
   Reports: {
-    screen: ReportsScreen,
+    screen: ReportsWithNav,
   }
 }, {
   drawerPosition: 'left',
@@ -59,7 +89,7 @@ export default class App extends React.Component {
           this.reportsLogger.logStatusChange(distanceToOffice < this.state.maxDistanceToOffice ? 'inside' : 'outside')
             .then(() => this.reportsLogger.getFullLog())
             .then((log) => {
-              this.setState(() => ({reportsLog: log.slice().reverse()}))
+              this.setState(() => ({reportsLog: log.slice()}))
             })
           this.setState({distanceToOffice, distanceError: null})
         }, 
@@ -71,13 +101,17 @@ export default class App extends React.Component {
       )
     })
 
-
-
     this.updateOfficeLongitude = this.updateOfficeLongitude.bind(this)
     this.updateOfficeLatitude = this.updateOfficeLatitude.bind(this)
     this.updateOfficeDistance = this.updateOfficeDistance.bind(this)
+    this.openDrawer = this.openDrawer.bind(this)
   }
   
+  openDrawer() {
+    // this.navigator.navigate('DrawerOpen')
+    Alert.alert('', JSON.stringify(this.navigator.props.navigation))
+  }
+
   updateOfficeLongitude(longitude) {
     return setOfficeCoords({
       longitude,
@@ -100,21 +134,11 @@ export default class App extends React.Component {
   }
 
   render() {
+
+
+
     return (
       <View style={styles.container}>
-        
-          {
-            this.state.distanceError ?
-            <Text style={styles.distanceContainer}>Error: {this.state.distanceError}</Text> : null
-          }
-          {
-            this.state.distanceToOffice ? 
-              ( (this.state.distanceToOffice > this.state.maxDistanceToOffice) ? 
-                <Text style={styles.distanceContainer}>Distance to office: {Math.round(this.state.distanceToOffice)} meters</Text> :
-                <Text style={styles.distanceContainer}>You are at office!</Text>
-              ): 
-              null
-          }
         
         <AppDrawer screenProps={{
           reportsLogger: this.reportsLogger, 
@@ -126,7 +150,12 @@ export default class App extends React.Component {
           onOfficeLongitudeUpdated: this.updateOfficeLongitude,
           onOfficeLatitudeUpdated: this.updateOfficeLatitude,
           onOfficeDistanceUpdated: this.updateOfficeDistance,
-          }} />
+          distanceToOffice: this.state.distanceToOffice,
+          distanceError: this.state.distanceError,
+          containerStyle: styles.screenContainer,
+          }} 
+          ref={nav=>{this.navigator=nav}}
+          />
       </View>
       )
   }
@@ -134,15 +163,19 @@ export default class App extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 25,
+    paddingTop: 23,
     flex: 1,
-    backgroundColor: '#fff',
-    // alignItems: 'center',
-    // justifyContent: 'flex-stretch',
+    backgroundColor: '#b3e5fc',
   },
-  distanceContainer: {
-    fontSize: 20,
-    padding: 5,
-    marginBottom: 5,
+  screenWrapper: {
+    flex: 1,
+  },
+  screenContainer: {
+    // flex: 1,
+  },
+  header: {
+    backgroundColor: '#0288d1',
+    height: 50,
+    padding: 15,
   }
 });
